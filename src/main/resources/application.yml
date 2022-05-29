@@ -1,0 +1,6 @@
+exchange:
+  client:
+    apiKey: "T5YBRHDCLlzib63xpJjXJOeXAoTRJAYg"
+    baseUrl: "https://api.apilayer.com/exchangerates_data"
+
+
