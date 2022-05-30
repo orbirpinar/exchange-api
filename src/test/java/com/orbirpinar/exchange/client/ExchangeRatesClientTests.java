@@ -3,13 +3,10 @@ package com.orbirpinar.exchange.client;
 
 import com.orbirpinar.exchange.client.dto.ExchangeClientError;
 import com.orbirpinar.exchange.client.dto.ExchangeRateClientResponseDto;
-import com.orbirpinar.exchange.dto.response.ExchangeConverterResponse;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestTemplate;
 
