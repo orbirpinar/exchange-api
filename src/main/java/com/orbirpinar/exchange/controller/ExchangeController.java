@@ -44,8 +44,8 @@ public class ExchangeController {
     public ResponseEntity<?> getAllConversionsBetweenTransactionDates(
             @RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
             @RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
-            @Positive @RequestParam(value = "pageSize",  defaultValue = "5") Integer pageSize,
-            @Positive @RequestParam(value = "pageNumber",  defaultValue = "0") Integer pageNumber
+            @RequestParam(value = "pageSize",  defaultValue = "5") Integer pageSize,
+            @RequestParam(value = "pageNumber",  defaultValue = "0") Integer pageNumber
     ) {
         return ResponseEntity.ok(exchangeService.getAllConversionBetweenTransactionDates(fromDate, toDate,
                 pageNumber, pageSize));
