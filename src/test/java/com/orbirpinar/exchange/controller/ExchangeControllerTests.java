@@ -1,5 +1,6 @@
 package com.orbirpinar.exchange.controller;
 
+import com.orbirpinar.exchange.aspect.LogAspect;
 import com.orbirpinar.exchange.dto.request.ExchangeConverterRequest;
 import com.orbirpinar.exchange.dto.request.ExchangeRateRequest;
 import com.orbirpinar.exchange.dto.response.ExchangeConverterResponse;
@@ -9,10 +10,12 @@ import com.orbirpinar.exchange.service.ExchangeService;
 import com.orbirpinar.exchange.util.ApiErrorCode;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.aop.AopAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
@@ -37,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = ExchangeController.class)
 @AutoConfigureJsonTesters
+@Import({AopAutoConfiguration.class, LogAspect.class})
 public class ExchangeControllerTests {
 
     @Autowired
