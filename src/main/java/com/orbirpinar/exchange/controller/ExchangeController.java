@@ -96,9 +96,9 @@ public class ExchangeController {
     })
     @GetMapping(value = "/conversion", params = {"fromDate", "toDate"})
     public ResponseEntity<?> getAllConversionsBetweenTransactionDates(
-            @Parameter(example = "02/06/2022", description = "Get conversions between two dates")
+            @Parameter(example = "2022-06-01",description = "format = 'yyyy-MM-dd'")
             @RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @Parameter(example = "03/06/2022", description = "Get conversions between two dates")
+            @Parameter(example = "2022-06-02", description = "format = 'yyyy-MM-dd'")
             @RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
             @RequestParam(value = "pageSize",  defaultValue = "5") Integer pageSize,
             @RequestParam(value = "pageNumber",  defaultValue = "0") Integer pageNumber
