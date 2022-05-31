@@ -119,8 +119,7 @@ public class RestApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(BAD_REQUEST)
-    protected ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex,
-                                                                      WebRequest request) {
+    protected ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
         ApiError apiError = new ApiError(BAD_REQUEST);
         apiError.setStatusCode(BAD_REQUEST.value());
         apiError.setMessage(String.format("The parameter '%s' of value '%s' could not be converted to type '%s'", ex.getName(), ex.getValue(), ex.getRequiredType().getSimpleName()));
@@ -130,7 +129,7 @@ public class RestApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(ExchangeClientException.class)
-    public ResponseEntity<Object> handleExchangeClientException(ExchangeClientException ex, WebRequest request) {
+    public ResponseEntity<Object> handleExchangeClientException(ExchangeClientException ex) {
         ApiError apiError = new ApiError(BAD_REQUEST);
         apiError.setStatusCode(BAD_REQUEST.value());
         apiError.setMessage("Exchange Client Error");
@@ -139,6 +138,16 @@ public class RestApiExceptionHandler extends ResponseEntityExceptionHandler {
         apiError.setErrorCode(ApiErrorCode.EXCHANGE_RATE_CLIENT_ERROR.getCode());
         return buildResponseEntity(apiError);
     }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Object> handleNotFoundException(NotFoundException ex) {
+        ApiError apiError = new ApiError(BAD_REQUEST);
+        apiError.setStatusCode(BAD_REQUEST.value());
+        apiError.setMessage(ex.getMessage());
+        apiError.setErrorCode(ApiErrorCode.RESOURCE_NOT_FOUND.getCode());
+        return buildResponseEntity(apiError);
+    }
+
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());

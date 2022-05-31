@@ -3,6 +3,7 @@ package com.orbirpinar.exchange.service;
 import com.orbirpinar.exchange.client.ExchangeClient;
 import com.orbirpinar.exchange.client.dto.ExchangeRateClientResponseDto;
 import com.orbirpinar.exchange.entity.Conversion;
+import com.orbirpinar.exchange.exception.NotFoundException;
 import com.orbirpinar.exchange.repository.ConversionRepository;
 import com.orbirpinar.exchange.dto.request.ExchangeConverterRequest;
 import com.orbirpinar.exchange.dto.request.ExchangeRateRequest;
@@ -60,7 +61,9 @@ public class ExchangeService {
         return conversions.map(Conversion::toResponse);
     }
 
-    public Optional<ExchangeConverterResponse> getConversionByTransactionId(String transactionId) {
-        return conversionRepository.findById(transactionId).map(Conversion::toResponse);
+    public ExchangeConverterResponse getConversionByTransactionId(String transactionId) {
+        Conversion conversion = conversionRepository.findById(transactionId)
+                .orElseThrow(() -> new NotFoundException(transactionId));
+        return conversion.toResponse();
     }
 }

@@ -4,7 +4,9 @@ import com.orbirpinar.exchange.dto.request.ExchangeConverterRequest;
 import com.orbirpinar.exchange.dto.request.ExchangeRateRequest;
 import com.orbirpinar.exchange.dto.response.ExchangeConverterResponse;
 import com.orbirpinar.exchange.dto.response.ExchangeRateResponse;
+import com.orbirpinar.exchange.exception.NotFoundException;
 import com.orbirpinar.exchange.service.ExchangeService;
+import com.orbirpinar.exchange.util.ApiErrorCode;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
@@ -92,7 +94,7 @@ public class ExchangeControllerTests {
                 post("/api/v1/exchange/rate")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonExchangeRateRequest.write(exchangeRateRequest).getJson())
-        ).andExpect(jsonPath("$.message").value("Validation error"))
+        ).andExpect(jsonPath("$.errorCode").value(ApiErrorCode.VALIDATION_ERROR.getCode()))
                 .andReturn().getResponse();
 
         // Assert
@@ -137,7 +139,7 @@ public class ExchangeControllerTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonExchangeConverterRequest.write(request).getJson()))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Validation error"));
+                .andExpect(jsonPath("$.errorCode").value(ApiErrorCode.VALIDATION_ERROR.getCode()));
     }
 
     @Test
@@ -165,6 +167,7 @@ public class ExchangeControllerTests {
     @Test
     public void getAllConversionsBetweenTransactionDates_shouldReturnListOfConversionsBetweenDates_WhenDatesAreValid() throws Exception {
 
+        // Arrange
         Page<ExchangeConverterResponse> converterResponseList = new PageImpl<>(
                 List
                         .of(new ExchangeConverterResponse(UUID.randomUUID().toString(),BigDecimal.TEN),
@@ -172,6 +175,7 @@ public class ExchangeControllerTests {
         );
         when(exchangeService.getAllConversionBetweenTransactionDates(any(),any(),anyInt(),anyInt())).thenReturn(converterResponseList);
 
+        // Act and assert
         mockMvc.perform(get("/api/v1/exchange/conversion")
                 .param("fromDate", LocalDate.now().toString())
                 .param("toDate",LocalDate.now().toString())
@@ -187,9 +191,11 @@ public class ExchangeControllerTests {
     @Test
     public void getAllConversionsBetweenTransactionDates_shouldReturnBadRequest_WhenDatesAreNotValidFormat() throws Exception {
 
+        // Arrange
         when(exchangeService.getAllConversionBetweenTransactionDates(any(),any(),anyInt(),anyInt()))
                 .thenThrow(IllegalArgumentException.class);
 
+        // Act and assert
         mockMvc.perform(get("/api/v1/exchange/conversion")
                 .param("fromDate", "01-06-2022")
                 .param("toDate", LocalDate.now().toString())
@@ -203,12 +209,13 @@ public class ExchangeControllerTests {
     @Test
     public void getConversionByTransactionId_shouldReturnSingleConversion_WhenIdExists() throws Exception {
 
+        // Arrange
         ExchangeConverterResponse exchangeConverterResponse = new ExchangeConverterResponse(UUID.randomUUID().toString(), BigDecimal.TEN);
         when(exchangeService.getConversionByTransactionId(any()))
-                .thenReturn(Optional.of(exchangeConverterResponse));
+                .thenReturn(exchangeConverterResponse);
 
-        mockMvc.perform(get("/api/v1/exchange/conversion")
-                .param("transactionId", UUID.randomUUID().toString())
+        // Act and Assert
+        mockMvc.perform(get("/api/v1/exchange/conversion/" + UUID.randomUUID())
                 .accept(MediaType.APPLICATION_JSON)
         ).andExpect(status().is2xxSuccessful())
                         .andExpect(jsonPath("$.result").value(10));
@@ -217,14 +224,13 @@ public class ExchangeControllerTests {
     @Test
     public void getConversionByTransactionId_shouldReturnNull_WhenGivenIdNotExists() throws Exception {
 
-        when(exchangeService.getConversionByTransactionId(any())).thenReturn(Optional.empty());
+        // Arrange
+        when(exchangeService.getConversionByTransactionId(any())).thenThrow(NotFoundException.class);
 
-        MockHttpServletResponse response = mockMvc.perform(get("/api/v1/exchange/conversion")
-                .param("transactionId", UUID.randomUUID().toString())
+        // Act and assert
+        mockMvc.perform(get("/api/v1/exchange/conversion/" + UUID.randomUUID())
                 .accept(MediaType.APPLICATION_JSON)
-        ).andExpect(status().is2xxSuccessful()).andReturn().getResponse();
-
-        assertEquals("null",response.getContentAsString());
-
+        ).andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.errorCode").value(ApiErrorCode.RESOURCE_NOT_FOUND.getCode()));
     }
 }

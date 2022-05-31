@@ -7,6 +7,7 @@ import com.orbirpinar.exchange.dto.request.ExchangeRateRequest;
 import com.orbirpinar.exchange.dto.response.ExchangeConverterResponse;
 import com.orbirpinar.exchange.dto.response.ExchangeRateResponse;
 import com.orbirpinar.exchange.entity.Conversion;
+import com.orbirpinar.exchange.exception.NotFoundException;
 import com.orbirpinar.exchange.repository.ConversionRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -129,23 +130,22 @@ public class ExchangeServiceTests {
         when(conversionRepositoryMock.findById(any())).thenReturn(Optional.of(getConversion()));
 
         // Act
-        Optional<ExchangeConverterResponse> conversionByTransactionId = sut.getConversionByTransactionId(UUID.randomUUID().toString());
+        ExchangeConverterResponse conversionByTransactionId = sut.getConversionByTransactionId(UUID.randomUUID().toString());
 
         // Assert
-        assertTrue(conversionByTransactionId.isPresent());
-        assertEquals(BigDecimal.valueOf(32.44),conversionByTransactionId.get().getResult());
+        assertEquals(BigDecimal.valueOf(32.44),conversionByTransactionId.getResult());
     }
 
     @Test
-    public void getConversionByTransactionId_shouldReturnEmpty_WhenCalledWithNotExistingId() {
+    public void getConversionByTransactionId_shouldThrowNotFoundException_WhenCalledWithNotExistingId() {
         // Arrange
-        when(conversionRepositoryMock.findById(any())).thenReturn(Optional.empty());
+        when(conversionRepositoryMock.findById(any())).thenThrow(NotFoundException.class);
 
         // Act
-        Optional<ExchangeConverterResponse> conversionByTransactionId = sut.getConversionByTransactionId(UUID.randomUUID().toString());
 
-        // Assert
-        assertTrue(conversionByTransactionId.isEmpty());
+        assertThrows(NotFoundException.class, () -> {
+             sut.getConversionByTransactionId(UUID.randomUUID().toString());
+        });
     }
 
     private Conversion getConversion() {
