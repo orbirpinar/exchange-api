@@ -12,7 +12,6 @@ mvn spring-boot:run
 
 ### To Run Test
 
-Both unit and integration tests run together
 
 ```bash
 mvn test
@@ -21,6 +20,6 @@ mvn test
 ### To See OpenAPI Docs
 
 - Run the project
-- Open any browser hit the below url
+- Open any browser and hit the below url
 - http://localhost:8080/swagger-ui/index.html
 - All necessary information is given in openapi-docs
