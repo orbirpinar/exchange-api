@@ -226,7 +226,7 @@ public class ExchangeControllerTests {
 
     }
     @Test
-    public void getConversionByTransactionId_shouldReturnNull_WhenGivenIdNotExists() throws Exception {
+    public void getConversionByTransactionId_shouldReturnError_WhenGivenIdNotExists() throws Exception {
 
         // Arrange
         when(exchangeService.getConversionByTransactionId(any())).thenThrow(NotFoundException.class);
