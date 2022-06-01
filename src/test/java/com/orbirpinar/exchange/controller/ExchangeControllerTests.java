@@ -1,6 +1,7 @@
 package com.orbirpinar.exchange.controller;
 
 import com.orbirpinar.exchange.aspect.LogAspect;
+import com.orbirpinar.exchange.controller.params.ConversionParams;
 import com.orbirpinar.exchange.dto.request.ExchangeConverterRequest;
 import com.orbirpinar.exchange.dto.request.ExchangeRateRequest;
 import com.orbirpinar.exchange.dto.response.ExchangeConverterResponse;
@@ -177,7 +178,7 @@ public class ExchangeControllerTests {
                         .of(new ExchangeConverterResponse(UUID.randomUUID().toString(),BigDecimal.TEN),
                                 new ExchangeConverterResponse(UUID.randomUUID().toString(),BigDecimal.ONE))
         );
-        when(exchangeService.getAllConversionBetweenTransactionDates(any(),any(),anyInt(),anyInt())).thenReturn(converterResponseList);
+        when(exchangeService.getAllConversionBetweenTransactionDates(any(ConversionParams.class))).thenReturn(converterResponseList);
 
         // Act and assert
         mockMvc.perform(get("/api/v1/exchange/conversion")
@@ -196,7 +197,7 @@ public class ExchangeControllerTests {
     public void getAllConversionsBetweenTransactionDates_shouldReturnBadRequest_WhenDatesAreNotValidFormat() throws Exception {
 
         // Arrange
-        when(exchangeService.getAllConversionBetweenTransactionDates(any(),any(),anyInt(),anyInt()))
+        when(exchangeService.getAllConversionBetweenTransactionDates(any(ConversionParams.class)))
                 .thenThrow(IllegalArgumentException.class);
 
         // Act and assert

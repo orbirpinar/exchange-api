@@ -1,7 +1,9 @@
 package com.orbirpinar.exchange.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.orbirpinar.exchange.client.dto.ExchangeRateClientResponseDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.DefaultResponseErrorHandler;
@@ -13,7 +15,8 @@ import java.util.stream.Collectors;
 
 public class ExchangeClientErrorHandler extends DefaultResponseErrorHandler {
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule());
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {

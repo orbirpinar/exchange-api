@@ -1,5 +1,6 @@
 package com.orbirpinar.exchange.controller;
 
+import com.orbirpinar.exchange.controller.params.ConversionParams;
 import com.orbirpinar.exchange.dto.request.ExchangeConverterRequest;
 import com.orbirpinar.exchange.dto.request.ExchangeRateRequest;
 import com.orbirpinar.exchange.dto.response.ExchangeConverterResponse;
@@ -7,21 +8,17 @@ import com.orbirpinar.exchange.dto.response.ExchangeRateResponse;
 import com.orbirpinar.exchange.exception.ApiError;
 import com.orbirpinar.exchange.service.ExchangeService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 
 
 @RestController
@@ -96,15 +93,9 @@ public class ExchangeController {
     })
     @GetMapping(value = "/conversion", params = {"fromDate", "toDate"})
     public ResponseEntity<?> getAllConversionsBetweenTransactionDates(
-            @Parameter(example = "2022-06-01",description = "format = 'yyyy-MM-dd'")
-            @RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @Parameter(example = "2022-06-02", description = "format = 'yyyy-MM-dd'")
-            @RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
-            @RequestParam(value = "pageSize",  defaultValue = "5") Integer pageSize,
-            @RequestParam(value = "pageNumber",  defaultValue = "0") Integer pageNumber
+            @ParameterObject @Valid ConversionParams params
     ) {
-        return ResponseEntity.ok(exchangeService.getAllConversionBetweenTransactionDates(fromDate, toDate,
-                pageNumber, pageSize));
+        return ResponseEntity.ok(exchangeService.getAllConversionBetweenTransactionDates(params));
     }
 
 

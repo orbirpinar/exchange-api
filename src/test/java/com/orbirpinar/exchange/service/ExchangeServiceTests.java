@@ -2,6 +2,7 @@ package com.orbirpinar.exchange.service;
 
 import com.orbirpinar.exchange.client.ExchangeClient;
 import com.orbirpinar.exchange.client.dto.ExchangeRateClientResponseDto;
+import com.orbirpinar.exchange.controller.params.ConversionParams;
 import com.orbirpinar.exchange.dto.request.ExchangeConverterRequest;
 import com.orbirpinar.exchange.dto.request.ExchangeRateRequest;
 import com.orbirpinar.exchange.dto.response.ExchangeConverterResponse;
@@ -13,10 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -116,7 +115,7 @@ public class ExchangeServiceTests {
         )).thenReturn(new PageImpl<>((List.of(conversion))));
 
         // Act
-        Page<ExchangeConverterResponse> conversions = sut.getAllConversionBetweenTransactionDates(LocalDate.now(), LocalDate.now(),0,5);
+        Page<ExchangeConverterResponse> conversions = sut.getAllConversionBetweenTransactionDates(new ConversionParams());
 
         // Assert
         assertEquals(1,conversions.getContent().size());
@@ -143,9 +142,7 @@ public class ExchangeServiceTests {
 
         // Act
 
-        assertThrows(NotFoundException.class, () -> {
-             sut.getConversionByTransactionId(UUID.randomUUID().toString());
-        });
+        assertThrows(NotFoundException.class, () -> sut.getConversionByTransactionId(UUID.randomUUID().toString()));
     }
 
     private Conversion getConversion() {

@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.validation.BindException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -20,6 +21,9 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import javax.validation.ConstraintViolationException;
+
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -53,13 +57,28 @@ public class RestApiExceptionHandler extends ResponseEntityExceptionHandler {
                 ex,
                 ApiErrorCode.UNSUPPORTED_MEDIA_TYPE.getCode()));
     }
-
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex,
             HttpHeaders headers,
             HttpStatus status,
             WebRequest request) {
+        ApiError apiError = new ApiError(BAD_REQUEST);
+        apiError.setStatusCode(BAD_REQUEST.value());
+        apiError.setMessage("Validation error");
+        apiError.setErrorCode(ApiErrorCode.VALIDATION_ERROR.getCode());
+        apiError.addValidationErrors(ex.getBindingResult().getFieldErrors());
+        apiError.addValidationError(ex.getBindingResult().getGlobalErrors());
+        return buildResponseEntity(apiError);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleBindException(
+             BindException ex,
+            HttpHeaders headers,
+            HttpStatus status,
+            WebRequest request
+    ) {
         ApiError apiError = new ApiError(BAD_REQUEST);
         apiError.setStatusCode(BAD_REQUEST.value());
         apiError.setMessage("Validation error");
@@ -125,6 +144,16 @@ public class RestApiExceptionHandler extends ResponseEntityExceptionHandler {
         apiError.setMessage(String.format("The parameter '%s' of value '%s' could not be converted to type '%s'", ex.getName(), ex.getValue(), ex.getRequiredType().getSimpleName()));
         apiError.setDebugMessage(ex.getMessage());
         apiError.setErrorCode(ApiErrorCode.TYPE_MISMATCH.getCode());
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
+
+        ApiError apiError = new ApiError(BAD_REQUEST);
+        apiError.setStatusCode(BAD_REQUEST.value());
+        apiError.setMessage("Validation error");
+        apiError.setErrorCode(ApiErrorCode.VALIDATION_ERROR.getCode());
         return buildResponseEntity(apiError);
     }
 

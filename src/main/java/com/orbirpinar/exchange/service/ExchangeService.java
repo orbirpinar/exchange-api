@@ -2,6 +2,7 @@ package com.orbirpinar.exchange.service;
 
 import com.orbirpinar.exchange.client.ExchangeClient;
 import com.orbirpinar.exchange.client.dto.ExchangeRateClientResponseDto;
+import com.orbirpinar.exchange.controller.params.ConversionParams;
 import com.orbirpinar.exchange.entity.Conversion;
 import com.orbirpinar.exchange.exception.NotFoundException;
 import com.orbirpinar.exchange.repository.ConversionRepository;
@@ -52,12 +53,10 @@ public class ExchangeService {
         return conversions.map(Conversion::toResponse);
     }
 
-    public Page<ExchangeConverterResponse> getAllConversionBetweenTransactionDates(LocalDate fromDate, LocalDate toDate,
-                                                                                   int pageNumber,
-                                                                                   int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+    public Page<ExchangeConverterResponse> getAllConversionBetweenTransactionDates(ConversionParams params) {
+        Pageable pageable = PageRequest.of(params.getPageNumber(), params.getPageSize());
         Page<Conversion> conversions = conversionRepository
-                .findAllByBetweenTransactionDates(fromDate, toDate, pageable);
+                .findAllByBetweenTransactionDates(params.getFromDate(), params.getToDate(), pageable);
         return conversions.map(Conversion::toResponse);
     }
 
