@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.AssertTrue;
 import java.time.LocalDate;
 
@@ -24,11 +25,11 @@ public class ConversionParams {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate toDate;
 
-    @AssertTrue(message = "fromDate field can't be later than toDate")
-    private boolean IsValid() {
+    @AssertFalse(message = "fromDate field can't be later than toDate")
+    private boolean isValidDate() {
         if(fromDate != null && toDate != null) {
-            return !fromDate.isAfter(toDate);
+            return fromDate.isAfter(toDate);
         }
-        return true;
+        return false;
     }
 }

@@ -9,6 +9,7 @@ import com.orbirpinar.exchange.dto.response.ExchangeRateResponse;
 import com.orbirpinar.exchange.exception.NotFoundException;
 import com.orbirpinar.exchange.service.ExchangeService;
 import com.orbirpinar.exchange.util.ApiErrorCode;
+import org.h2.api.ErrorCode;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.aop.AopAutoConfiguration;
@@ -204,10 +205,24 @@ public class ExchangeControllerTests {
         mockMvc.perform(get("/api/v1/exchange/conversion")
                 .param("fromDate", "01-06-2022")
                 .param("toDate", LocalDate.now().toString())
-                        .param("pageNumber","0")
-                        .param("pageSize","1")
                 .accept(MediaType.APPLICATION_JSON)
         ).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void getAllConversionsBetweenTransactionDates_shouldReturnBadRequest_WhenFromDateLaterThanToDate() throws Exception {
+
+        // Arrange
+        when(exchangeService.getAllConversionBetweenTransactionDates(any(ConversionParams.class)))
+                .thenThrow(IllegalArgumentException.class);
+
+        // Act and assert
+        mockMvc.perform(get("/api/v1/exchange/conversion")
+                .param("fromDate","2022-06-02" )
+                .param("toDate", "2022-06-01")
+                .accept(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value(ApiErrorCode.VALIDATION_ERROR.getCode()));
     }
 
 
